@@ -240,5 +240,6 @@ pyrightconfig.json
 
 /neo4j_csvs/*
 /yelp_dataset/*
+/preprocessed/*
 
 !.gitkeep
