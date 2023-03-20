@@ -139,25 +139,22 @@ class HGT(nn.Module):
         self.out2 = nn.Linear(n_hid//2, n_out)
 
     def forward(self, G, out_key):
-        h = { 'src':{}, 'dst':{}}
+        h = { 'src': {}, 'dst': {} }
         explain_dicts = []
-
         for ntype in G[0].srcdata['embedding']:
            h['src'][ntype] = self.input_norm(F.gelu(self.adapt_ws[ntype](G[0].srcdata['embedding'][ntype])))
-
         for i in range(self.n_layers):
             for ntype in G[i].dstdata['embedding']:
                 h['dst'][ntype]= self.input_norm(F.gelu(self.adapt_ws[ntype](G[i].dstdata['embedding'][ntype])))
             h, explain_dict = self.gcs[i](G[i], h)
             explain_dicts.append(explain_dict)
-
         if isinstance(out_key, str):
             h['src'][out_key] = torch.nn.functional.normalize(h['src'][out_key])
             return self.out2(F.gelu(self.out1(h['src'][out_key]))), explain_dicts
-        
-        elif isinstance(out_key, tuple) and len(out_key) == 2:
+        elif isinstance(out_key, tuple) and len(out_key)==2:
             h['src'][out_key[0]] = torch.nn.functional.normalize(h['src'][out_key[0]])
             h['src'][out_key[1]] = torch.nn.functional.normalize(h['src'][out_key[1]])
+            #controllare queste ultime righe quando si allena con blocks, dovrebbero non funzionare, capire perché
             G.nodes[out_key[0]].data['qh'] = self.out2(F.gelu(self.out1(h[out_key[0]])))
             G.nodes[out_key[1]].data['th'] = self.out2(F.gelu(self.out1(h[out_key[1]])))
             return G, explain_dicts
