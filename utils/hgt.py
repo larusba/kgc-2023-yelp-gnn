@@ -54,11 +54,10 @@ class HGTLayer(nn.Module):
         nn.init.xavier_uniform_(self.relation_msg)
 
     def forward(self, G, h):
-        explain_dict = {}
         with G.local_scope():
             node_dict, edge_dict = self.node_dict, self.edge_dict
             for srctype, etype, dsttype in G.canonical_etypes:
-                #if h.get(srctype) is not None and h.get(dsttype) is not None and edge_dict.get((srctype, etype, dsttype)) is not None:
+                # if h.get(srctype) is not None and h.get(dsttype) is not None and edge_dict.get((srctype, etype, dsttype)) is not None:
                 sub_graph = G[srctype, etype, dsttype]
 
                 k_linear = self.k_linears[node_dict[srctype]]
@@ -93,8 +92,6 @@ class HGTLayer(nn.Module):
                 attn_score = edge_softmax(sub_graph, attn_score, norm_by='dst')
 
                 sub_graph.edata['t'] = attn_score.unsqueeze(-1)
-                explain_dict[(srctype, etype, dsttype)] = attn_score.unsqueeze(-1)
-    
             G.multi_update_all({etype : (fn.u_mul_e('v_%d' % e_id, 't', 'm'), fn.sum('m', 't')) \
                                 for etype, e_id in edge_dict.items() if etype in G.canonical_etypes}, cross_reducer = 'mean')
             # il controllo in etypes serve per non far rompere il codice quando non abbiamo tutti i tipi nel subgraph
@@ -107,7 +104,7 @@ class HGTLayer(nn.Module):
                 '''
                 n_id = node_dict[ntype]
                 alpha = torch.sigmoid(self.skip[n_id])
-                if G.dstdata['t'][ntype] is not None:
+                if G.dstdata['t'].get(ntype) is not None:
                     t = F.gelu(G.dstdata['t'][ntype]).view(-1, self.out_dim)
                     trans_out = self.drop(self.a_linears[n_id](t))
                     trans_out = trans_out * alpha + h['dst'][ntype] * (1-alpha)
@@ -117,7 +114,7 @@ class HGTLayer(nn.Module):
                         new_h['src'][ntype] = trans_out
                 else:
                     print("niente t")
-            return new_h, explain_dict
+            return new_h
 
 class HGT(nn.Module):
     def __init__(self, node_dict, edge_dict, features_dim_dict, n_hid, n_out, n_layers, n_heads, use_norm = True):
@@ -132,6 +129,7 @@ class HGT(nn.Module):
         self.adapt_ws  = nn.ModuleDict()
         self.input_norm = nn.LayerNorm(n_hid)
         for ntype in self.features_dim_dict:
+            print(ntype)
             self.adapt_ws.add_module(ntype, nn.Linear(features_dim_dict[ntype], n_hid))
         for _ in range(n_layers):
             self.gcs.append(HGTLayer(n_hid, n_hid, node_dict, edge_dict, n_heads, use_norm = use_norm))
@@ -140,21 +138,20 @@ class HGT(nn.Module):
 
     def forward(self, G, out_key):
         h = { 'src': {}, 'dst': {} }
-        explain_dicts = []
-        for ntype in G[0].srcdata['embedding']:
-           h['src'][ntype] = self.input_norm(F.gelu(self.adapt_ws[ntype](G[0].srcdata['embedding'][ntype])))
+        for ntype in G[0].srcdata['feat']:
+           h['src'][ntype] = self.input_norm(F.gelu(self.adapt_ws[ntype](G[0].srcdata['feat'][ntype])))
         for i in range(self.n_layers):
-            for ntype in G[i].dstdata['embedding']:
-                h['dst'][ntype]= self.input_norm(F.gelu(self.adapt_ws[ntype](G[i].dstdata['embedding'][ntype])))
-            h, explain_dict = self.gcs[i](G[i], h)
-            explain_dicts.append(explain_dict)
+            for ntype in G[i].dstdata['feat']:
+                h['dst'][ntype]= self.input_norm(F.gelu(self.adapt_ws[ntype](G[i].dstdata['feat'][ntype])))
+            h = self.gcs[i](G[i], h)
         if isinstance(out_key, str):
+            print(h)
             h['src'][out_key] = torch.nn.functional.normalize(h['src'][out_key])
-            return self.out2(F.gelu(self.out1(h['src'][out_key]))), explain_dicts
+            return self.out2(F.gelu(self.out1(h['src'][out_key])))
         elif isinstance(out_key, tuple) and len(out_key)==2:
             h['src'][out_key[0]] = torch.nn.functional.normalize(h['src'][out_key[0]])
             h['src'][out_key[1]] = torch.nn.functional.normalize(h['src'][out_key[1]])
             #controllare queste ultime righe quando si allena con blocks, dovrebbero non funzionare, capire perché
             G.nodes[out_key[0]].data['qh'] = self.out2(F.gelu(self.out1(h[out_key[0]])))
             G.nodes[out_key[1]].data['th'] = self.out2(F.gelu(self.out1(h[out_key[1]])))
-            return G, explain_dicts
+            return G
