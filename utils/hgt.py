@@ -113,7 +113,7 @@ class HGTLayer(nn.Module):
                     else:
                         new_h['src'][ntype] = trans_out
                 else:
-                    print("niente t")
+                    print("t not found")
             return new_h
 
 class HGT(nn.Module):
@@ -129,7 +129,6 @@ class HGT(nn.Module):
         self.adapt_ws  = nn.ModuleDict()
         self.input_norm = nn.LayerNorm(n_hid)
         for ntype in self.features_dim_dict:
-            print(ntype)
             self.adapt_ws.add_module(ntype, nn.Linear(features_dim_dict[ntype], n_hid))
         for _ in range(n_layers):
             self.gcs.append(HGTLayer(n_hid, n_hid, node_dict, edge_dict, n_heads, use_norm = use_norm))
@@ -142,10 +141,9 @@ class HGT(nn.Module):
            h['src'][ntype] = self.input_norm(F.gelu(self.adapt_ws[ntype](G[0].srcdata['feat'][ntype])))
         for i in range(self.n_layers):
             for ntype in G[i].dstdata['feat']:
-                h['dst'][ntype]= self.input_norm(F.gelu(self.adapt_ws[ntype](G[i].dstdata['feat'][ntype])))
+                h['dst'][ntype] = self.input_norm(F.gelu(self.adapt_ws[ntype](G[i].dstdata['feat'][ntype])))
             h = self.gcs[i](G[i], h)
         if isinstance(out_key, str):
-            print(h)
             h['src'][out_key] = torch.nn.functional.normalize(h['src'][out_key])
             return self.out2(F.gelu(self.out1(h['src'][out_key])))
         elif isinstance(out_key, tuple) and len(out_key)==2:
