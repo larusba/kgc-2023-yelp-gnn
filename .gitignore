@@ -242,6 +242,7 @@ pyrightconfig.json
 /yelp_dataset/*
 /preprocessed/*
 /training_data/*
+/models/*
 /runs/
 
 !.gitkeep
