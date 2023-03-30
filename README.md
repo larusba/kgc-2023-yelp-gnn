@@ -1,5 +1,6 @@
+
 <a href="https://larus-ba.it/">
-    <img src="https://larus-ba.it/wp-content/uploads/2022/10/logo-larus-horizontal.png" alt="Larus logo" title="Larus" align="right" height="50" />
+    <img src="https://larus-ba.it/wp-content/uploads/2023/01/Favicon-LARUS.png" alt="Larus logo" title="Larus" align="right" height="100" />
 </a>
 
 # Business recommendation on Yelp Dataset using GNN
@@ -20,7 +21,11 @@ The workshop can be followed using a Python Notebook and the Neo4j Desktop appli
 
 ## Masterclass at KGC
 The Knowledge Graph Conference (KGC) 2023 is a 5-day hybrid conference with multiple parallel tracks every day, covering a multitude of topics related to knowledge graph technologies.  
-This repo is for the masterclass yield by Larus members at KGC.
+This repo is for the masterclass yield by LARUS members at KGC.
+
+## About us
+LARUS R&D Tribe created this project.  
+It would be hard for a tech company to remain innovative and competitive without a continuous investment in R&D. That is why in LARUS there is an entire tribe dedicated to research and technological development involved in an ongoing solid relationship with relevant Italian and foreign universities, observatories, research institutes, labs but also professors and researchers.
 
 ## Installation 
 
