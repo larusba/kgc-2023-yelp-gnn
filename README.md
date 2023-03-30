@@ -28,9 +28,10 @@ LARUS R&D Tribe created this project.
 It would be hard for a tech company to remain innovative and competitive without a continuous investment in R&D. That is why in LARUS there is an entire tribe dedicated to research and technological development involved in an ongoing solid relationship with relevant Italian and foreign universities, observatories, research institutes, labs but also professors and researchers.
 
 ## Installation 
+Assuming that you already have Python installed on your local machine.
+```
+pip install -r requirements.txt
+```
+If you want to perform some graph exploration/visualization you also need to have Neo4j Desktop installed.  
 
-## Some advice
-
-## Theoretical overview
-
-## Thank you
+# Thank you for your curiosity
