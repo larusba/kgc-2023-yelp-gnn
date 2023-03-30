@@ -1,5 +1,5 @@
 <a href="https://larus-ba.it/">
-    <img src="https://larus-ba.it/wp-content/uploads/2022/10/logo-larus-horizontal.png" alt="Larus logo" title="Aimeos" align="right" height="60" />
+    <img src="https://larus-ba.it/wp-content/uploads/2022/10/logo-larus-horizontal.png" alt="Larus logo" title="Larus" align="right" height="50" />
 </a>
 
 # Business recommendation on Yelp Dataset using GNN
@@ -17,6 +17,10 @@ Then, we will use Neo4j to inspect and visualize the graph.
 The central part of the workshop focuses on how to use the DGL library to create a heterogenous Graph Neural Network, preprocess the dataset, and use the graph to produce business recommendations for users.
 We will use Python, Deep Graph Library (DGL), and Neo4j.
 The workshop can be followed using a Python Notebook and the Neo4j Desktop application.
+
+## Masterclass at KGC
+The Knowledge Graph Conference (KGC) 2023 is a 5-day hybrid conference with multiple parallel tracks every day, covering a multitude of topics related to knowledge graph technologies.  
+This repo is for the masterclass yield by Larus members at KGC.
 
 ## Installation 
 
