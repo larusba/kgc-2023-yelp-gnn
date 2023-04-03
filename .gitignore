@@ -243,6 +243,8 @@ pyrightconfig.json
 /preprocessed/*
 /training_data/*
 /models/*
+/qdrant_storage/*
+qdrant_snapshots/*
 /runs/
 
 !.gitkeep
