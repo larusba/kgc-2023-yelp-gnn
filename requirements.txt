@@ -157,7 +157,7 @@ torch==1.13.1
 tornado==6.2
 tqdm==4.64.1
 traitlets==5.8.1
-transformers==4.27.0
+transformers==4.30.0
 twine==4.0.2
 typing_extensions==4.4.0
 umap-learn==0.5.3
