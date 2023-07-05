@@ -36,7 +36,7 @@ fsspec==2023.1.0
 funcsigs==1.0.2
 google-auth==2.16.0
 google-auth-oauthlib==0.4.6
-grpcio==1.51.1
+grpcio==1.53.0
 huggingface-hub==0.13.2
 idna==3.4
 importlib-metadata==6.0.0
